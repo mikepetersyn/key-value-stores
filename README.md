@@ -6,4 +6,4 @@ This repository contains the exercises for the lecture **Key Value Stores**, whi
 ...
 
 ## Installing Docker on Ubuntu
-During the course of the exercise, we will run multiple Redis nodes using Docker. You can use the provided [installation script](blob/main/docker_install.sh) for this on Ubuntu (tested on 20.04 LTS).
+During the course of the exercise, we will run multiple Redis nodes using Docker. You can use the provided [installation script](https://github.com/mikeptrsn/key-value-stores/blob/main/docker_install.sh) for this on Ubuntu (tested on 20.04 LTS).
