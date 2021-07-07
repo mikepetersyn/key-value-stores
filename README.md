@@ -1,7 +1,7 @@
 # Key-Value-Stores
 This repository contains the exercises for the lecture **Key Value Stores**, which took place in the course **Storage Systems** in the summer term 2021.
 
-# System Configuration
+# 1. System Configuration
 During the course of the exercise, we will run multiple Redis nodes using Docker. All the following steps can be performed **directly on your machine**. However, if you don't want to do a Docker installation directly on your machine, you can also switch to a **VM**. Note, that for smooth functionality from the Redis cluster, at least 
 - 2 CPU cores and 
 - 6GB of memory are required.
@@ -18,19 +18,21 @@ For installation on other operating systems or Linux distributions we can refer 
 
 ---
 
-## Get a Virtual Machine Running
+## 1.1 Get a Virtual Machine Running
 ...
 
 ---
 
-## Installing Docker on Ubuntu
+## 1.2 Installing Docker on Ubuntu
  You can use the provided [installation script](https://github.com/mikeptrsn/key-value-stores/blob/main/docker_install.sh) for this on Ubuntu (tested on 20.04 LTS).
 
 Check if docker is running first with `sudo systemctl status docker` and then with `docker run hello-world`. The first command checks if the daemon is working properly. The second command is to check if the permissions for the current user are set correctly. If there is an error regarding the permissions for running `docker run`, check again the commands in the [installation script](https://github.com/mikeptrsn/key-value-stores/blob/main/docker_install.sh) starting at line 30 (post-installation steps).
 
-## Installing and Running Your First Redis Node
----
-### Load the Redis Image
+# 2. Installing and Running Your First Redis Node
+In this Hello World example, you'll set up a simple single node cluster in Redis.
+
+:watch: *Time to complete:* ~10 minutes
+## 2.1 Load the Redis Image
 Redislabs provides a prebuilt [image](https://registry.hub.docker.com/r/redislabs/redis) for Docker, which can be deployed with the following command:
 ```
 docker run -d --cap-add sys_resource \
@@ -41,11 +43,8 @@ docker run -d --cap-add sys_resource \
 redislabs/redis
 ```
 
-Q: *What are the individual parameters for?*
-
-
 | Parameter | Description |
-| --------: | ----------- |
+| --------: | :---------- |
 | `-d`      | run in background|
 |`--cap-add sys_resource`| add Linux sys_resources capabilities to proper privileges |
 | `--name redis-node1`| container name |
@@ -56,36 +55,60 @@ Q: *What are the individual parameters for?*
 
 ---
 
-### Create a new Cluster
+## 2.2 Create a new Cluster
+Now configure a Redis cluster using the `rladmin` tool and `create cluster command`:
 
-After starting the container with the command shown above, you can configure the system by paying a visit to the Management UI:
-
-1. Visit [https://localhost:8443/](https://localhost:8443/) and connect by adding a security exception in your browser (there is a warning message because we are not using a valid certificate).
-
-2. Click on **Setup**.
-
-3. Change the Cluster Name to **my-redis-cluster.storage-systems.de**.
-
-![Step 3](./images/create_cluster_0.png "Step 3 of the Cluster Configuration")
-
-4. Click on **Next**.
-
-5. On the Cluster Authentication just leave out the field and click on **Next** (*this will activate the trial version*).
-
-6. Enter the admin credentials and click on **Next** (*You don't need to enter a real mail address!*)
-
-![Step 6](./images/create_cluster_1.png "Step 6 of the Cluster Configuration")
-
-7. If the loading circle does not disappear, click Sign-Out at the top right of the interface and log in again with your credentials.
+```
+docker exec -d --privileged \
+redis-node1 "/opt/redislabs/bin/rladmin" \
+cluster create \
+name my-redis.local \
+username myname@mymail.com \
+password storage21
+```
 ---
 
-### Adding a Database
-
+## 2.3 Adding a Database
+Then create a new database on the cluster as follows:
+```
+curl -k -u "myname@mymail.com:storage21" \
+--request POST \
+--url "https://localhost:9443/v1/bdbs" \
+--header 'content-type: application/json' \
+--data '{"name":"db1","type":"redis","memory_size":128000000,"port":12000}'
+``` 
 ---
 
+## 2.4 Checking That Redis is Working
 
+Congratulations! You have
+- installed a single node cluster or Redis Enterprise using Docker,
+- created a new cluster and
+- created a new database (listening on port 12000).
 
+Go ahead and try out Redis by connecting to the container and SET a key-value-pair by using the `redis-cli`:
 
+```
+docker exec -it redis-node1 /bin/bash
+
+redislabs@[container-id]:/opt$ redis-cli-p 12000
+
+127.0.0.1:12000> SET foo bar
+OK
+
+127.0.0.1:12000> GET foo
+"bar"
+
+127.0.0.1:12000> exit
+```
+
+Stay in the container for a moment and get an overview by running the command `rladminstatus`, to get information about the deployment.
+
+![rladminstatus](./images/rladminstatus_0.png "rladminstatus")
+
+As you can probably see in this overview, we have not yet made any special settings regarding clustering and replication. In the next step, we will add new nodes to the cluster and enable replication and sharding.
+
+---
 
 
 
