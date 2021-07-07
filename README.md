@@ -28,7 +28,7 @@ For installation on other operating systems or Linux distributions we can refer 
 
 Check if docker is running first with `sudo systemctl status docker` and then with `docker run hello-world`. The first command checks if the daemon is working properly. The second command is to check if the permissions for the current user are set correctly. If there is an error regarding the permissions for running `docker run`, check again the commands in the [installation script](https://github.com/mikeptrsn/key-value-stores/blob/main/docker_install.sh) starting at line 30 (post-installation steps).
 
-# 2. Installing and Running Your First Redis Node
+# 2. Hello World: Your First Redis Node
 In this Hello World example, you'll set up a simple single node cluster in Redis.
 
 :watch: *Time to complete:* ~10 minutes
@@ -81,7 +81,7 @@ curl -k -u "myname@mymail.com:storage21" \
 
 ## 2.4 Checking That Redis is Working
 
-Congratulations! You have
+Congratulations! :tada: You have
 - installed a single node cluster or Redis Enterprise using Docker,
 - created a new cluster and
 - created a new database (listening on port 12000).
@@ -102,13 +102,24 @@ OK
 127.0.0.1:12000> exit
 ```
 
-Stay in the container for a moment and get an overview by running the command `rladminstatus`, to get information about the deployment.
+Stay in the container for a moment and get an overview by running the command `rladmin status`, to get information about the deployment.
 
 ![rladminstatus](./images/rladminstatus_0.png "rladminstatus")
 
 As you can probably see in this overview, we have not yet made any special settings regarding clustering and replication. In the next step, we will add new nodes to the cluster and enable replication and sharding.
 
 ---
+
+# 3. Extend your Cluster
+Now it is time to add new nodes and perform a cluster join. You will also enable clustering and replication for the database.
+
+:watch: *Time to complete:* ~20 minutes
+
+## 3.1 Adding New Nodes
+
+To add new nodes to the cluster, you need to start new containers. For this you can use the command from section [2.1](./README.md#2.1-Load-the-Redis-Image) Please note that all nodes run on the same host. This means that you have to assign different values for the different endpoint ports. 
+
+Example: `-p 8443:8443` is already taken by redis-node1. Try something like `-p 8444:8443` etc.
 
 
 
