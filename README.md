@@ -117,7 +117,7 @@ Now it is time to add new nodes and perform a cluster join. You will also enable
 
 ## 3.1 Adding New Nodes
 
-To add new nodes to the cluster, you need to start new containers. For this you can use the command from section [2.1](./README.md#2.1-Load-the-Redis-Image) Please note that all nodes run on the same host. This means that you have to assign different values for the different endpoint ports. 
+To add new nodes to the cluster, you need to start new containers. For this you can use the command from section [2.1](./README.md#21-load-the-redis-image) Please note that all nodes run on the same host. This means that you have to assign different values for the different endpoint ports. 
 
 Example: `-p 8443:8443` is already taken by redis-node1. Try something like `-p 8444:8443` etc.
 
