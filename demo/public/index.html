@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="main"></div>
+    <style>
+        img {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            opacity: 0;
+            transition: opacity 500ms ease;
+        }
+    </style>
+    <script>
+        const main = document.getElementById('main');
+        const buildPage = async () => {
+
+        console.time('render dom tree');
+
+        const photos = await fetch('/photos')
+        .then(res => res.json())
+        .then(data => {
+            data.data.forEach(photo => {
+                const img = document.createElement('img');
+                img.setAttribute('defer', true);
+                img.classList.add('lazy');
+                img.style.opacity = 0;
+                img.setAttribute('data-src', photo.thumbnailUrl);
+
+                main.appendChild(img);
+            });
+
+            console.timeEnd('render dom tree');
+        })
+        .then(() => {
+            lazyLoad();
+        })
+        .catch(err => console.log(err))
+    }
+
+
+
+    function lazyLoad() {
+	const lazyImages = [].slice.call(document.querySelectorAll('img.lazy'));
+	if (lazyImages.length == 0) return;
+
+	const lazyImageObserver = new IntersectionObserver((entries, observer) => {
+		entries.forEach(function (entry) {
+			if (entry.isIntersecting) {
+				const lazyImage = entry.target;
+				lazyImage.src = lazyImage.dataset.src;
+				lazyImage.classList.remove('lazy');
+				lazyImageObserver.unobserve(lazyImage);
+				lazyImage.style.opacity = 1;
+			}
+		});
+	});
+
+	lazyImages.forEach((lazyImage) => {
+		lazyImageObserver.observe(lazyImage);
+	});
+}
+    buildPage();
+    
+    </script>
+</body>
+</html>
