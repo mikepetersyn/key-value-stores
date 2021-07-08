@@ -4,7 +4,9 @@
   "description": "demo application for key-value-stores",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon index.js",
+    "pure": "nodemon pure.js",
+    "redis": "nodemon redis.js"
   },
   "author": "",
   "license": "ISC",
