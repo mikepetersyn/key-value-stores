@@ -137,19 +137,8 @@ Example: `-p 8443:8443` is already taken by redis-node1. Try something like `-p 
 The demo folder contains to applications: pure.js and redis.js which showcases the durations of an api-request with and without caching.
 
 ## 4.1 Install dependencies
-- install git
 ```
-sudo apt install git -y
-```
-
-- install NodeJS
-```
-sudo apt install nodejs -y
-```
-
-- install redis
-```
-sudo apt install redis -y
+sudo apt install git nodejs npm redis -y
 ```
 
 - clone the repository and install dependencies
