@@ -129,3 +129,47 @@ Example: `-p 8443:8443` is already taken by redis-node1. Try something like `-p 
 [Docker Installation](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
 
 [Redis Installation and Configuration](http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/)
+
+
+---
+
+# 4. Caching Demo based on Node-Application and redis
+The demo folder contains to applications: pure.js and redis.js which showcases the durations of an api-request with and without caching.
+
+## 4.1 Install dependencies
+- install git
+```
+sudo apt install git -y
+```
+
+- install NodeJS
+```
+sudo apt install nodejs -y
+```
+
+- install redis
+```
+sudo apt install redis -y
+```
+
+- clone the repository and install dependencies
+```
+git clone https://github.com/mikeptrsn/key-value-stores.git &&
+cd key-value-stores/demo &&
+npm i
+```
+
+| Command | Description |
+| --------: | :---------- |
+| `npm run pure` | starts the pure demo without caching |
+| `npm run redis` | starts the redis demo with caching |
+
+Both services are available via http://localhost:3000
+
+| Route | Description |
+| --------: | :---------- |
+| `/photos` | requests meta-data of 5000 photos from https://jsonplaceholder.typicode.com |
+
+Example: Open http://localhost:3000/photos in the Browser
+
+---
