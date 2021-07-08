@@ -90,7 +90,7 @@ demo@ubuntu:~$ redis-cli
 127.0.0.1:6379> set key value [expiration EX seconds|PX milliseconds] [NX|XX]
 ```
 
-## 3.1 Set key-values
+## 3.1 Set key-value
 ```
 Syntax:
 set value key
@@ -130,7 +130,7 @@ flushall
 If you'll check all available keys now again, the result should display *(empty list or set)*.
 
 ## 3.4 Set key-value with automatically expiration time
-This example shows that you can choose the key freely. In this case we decided to use *hw* as key. Furthermore as value you can use any kind of string. Because the value in this case consists of two words, you have wrappe them with single quotes to ensure it as string.
+This example shows that you can choose the key freely. In this case we decided to use *hw* as key. Furthermore as value you can use any kind of string. Because the value in this case consists of two words, you have to wrapped up with single quotes to ensure it as string.
 ```
 Syntax:
 setex key seconds value
@@ -158,10 +158,6 @@ Set the previous key-value with expiration time again. This time with 120 second
 setex hw 120 'Hello World'
 ```
 Use *ttl hw* to check the TTL of the key hw. This time for the next 120 seconds this should results *(integer) any number between 0 - 120 seconds*
-
-
-
-
 
 
 
