@@ -14,5 +14,5 @@ cluster-node-timeout 5000
 appendonly yes
 dir /home/ubuntu/cluster_test
 protected-mode no
-bind $(hostname -I)
+bind $(hostname -I) 127.0.0.1
 EOF
