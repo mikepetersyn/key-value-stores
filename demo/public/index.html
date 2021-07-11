@@ -52,34 +52,40 @@
             const main = document.getElementById('main');
             const sum = document.querySelector('.sum');
 
-            const buildPage = async () => {
+            const buildPage = () => {
                 console.time('render dom tree');
-                let sumTime = 0;
 
+                const s = Date.now();
+                const allPromises = [];
                 for (let i = 1; i < 101; i++) {
-                    const s = Date.now();
+                    allPromises.push(
+                        new Promise(async (resolve, reject) => {
+                            const s = Date.now();
+                            await fetch(`/photos/${i}`)
+                                .then((res) => res.json())
+                                .then((data) => {
+                                    const time = document.createElement('div');
+                                    time.classList.add('image');
+                                    time.innerHTML = `<div class="time">${data.time} ms</div>`;
 
-                    await fetch(`/photos/${i}`)
-                        .then((res) => res.json())
-                        .then((data) => {
-                            const d = Date.now() - s;
-
-                            const time = document.createElement('div');
-                            time.classList.add('image');
-                            time.innerHTML = `<div class="time">${d} ms</div>`;
-
-                            const img = document.createElement('img');
-                            img.setAttribute('defert', true);
-                            img.setAttribute('src', data.thumbnailUrl);
-                            time.appendChild(img);
-                            main.appendChild(time);
-                            sumTime += d;
-                            return d;
+                                    const img = document.createElement('img');
+                                    img.setAttribute('defert', true);
+                                    img.setAttribute('src', data.photo.thumbnailUrl);
+                                    time.appendChild(img);
+                                    main.appendChild(time);
+                                    resolve();
+                                })
+                                .catch((err) => {
+                                    reject(err);
+                                });
                         })
-                        .catch((err) => console.log(err));
+                    );
                 }
-                sum.innerHTML = `total: ${sumTime / 1000} s`;
-                sum.style.opacity = 1;
+
+                Promise.all(allPromises).then((durations) => {
+                    sum.innerHTML = `total: ${((Date.now() - s) / 1000).toFixed(2)} s`;
+                    sum.style.opacity = 1;
+                });
 
                 console.timeEnd('render dom tree');
             };

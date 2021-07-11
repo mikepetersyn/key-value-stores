@@ -20,7 +20,7 @@ const redisClient = new RedisClustr({
     ],
 });
 
-const default_expiration = 60;
+const default_expiration = 120;
 
 app.use(express.static('public'));
 
@@ -29,16 +29,18 @@ redisClient.on('connect', () => {
 });
 
 app.get('/photos/:albumId', (req, res) => {
-    console.time('response duration');
+    //console.time('response duration');
 
     const albumId = req.params.albumId;
+    const s = Date.now();
 
     redisClient.get(`albumId?${albumId}`, async (error, photos) => {
         if (error) console.log(error);
         if (photos) {
             console.log('\nCACHED. Found data on redis-server');
-            console.timeEnd('response duration');
-            return res.json(JSON.parse(photos));
+            //console.timeEnd('response duration');
+            const d = Date.now() - s;
+            return res.json({ time: d, photo: JSON.parse(photos) });
         }
 
         const { data } = await axios.get(`https://jsonplaceholder.typicode.com/photos/${albumId}`);
@@ -47,13 +49,14 @@ app.get('/photos/:albumId', (req, res) => {
         redisClient.setex(`albumId?${albumId}`, default_expiration, JSON.stringify(data));
 
         console.log('\nNOT CACHED. Requesting data from API');
-        console.timeEnd('response duration');
+        //console.timeEnd('response duration');
 
         setTimeout(() => {
             console.log('\n"photos" expired: REMOVED FROM redis-server');
         }, default_expiration * 1000);
 
-        res.json(data);
+        const d2 = Date.now() - s;
+        return res.json({ time: d2, photo: data });
     });
 });
 
