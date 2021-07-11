@@ -1,73 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <div id="main"></div>
-    <style>
-        img {
-            position: relative;
-            width: 150px;
-            height: 150px;
-            opacity: 0;
-            transition: opacity 500ms ease;
-        }
-    </style>
-    <script>
-        const main = document.getElementById('main');
-        const buildPage = async () => {
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="main"></div>
+        <div class="sum">total: 120 ms</div>
+        <style>
+            img {
+                position: absolute;
+                width: 100px;
+                height: 100px;
+                z-index: -1;
+            }
 
-        console.time('render dom tree');
+            .image {
+                display: flex;
+                float: left;
+                flex-wrap: wrap;
+                position: relative;
+                width: 100px;
+                height: 100px;
+            }
+            .time {
+                position: absolute;
+                margin: 4px;
+                padding: 2px 4px;
+                background: white;
+            }
+            .sum {
+                position: fixed;
+                text-align: center;
+                line-height: 130px;
+                font-size: 50px;
+                left: 50%;
+                top: 25%;
+                opacity: 0;
+                transform: translate(-50%, 25%);
+                width: 400px;
+                height: 130px;
+                background: white;
+                border-radius: 5px;
+                box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.8);
+                transition: opacity 500ms ease;
+            }
+        </style>
+        <script>
+            const main = document.getElementById('main');
+            const sum = document.querySelector('.sum');
 
-        const photos = await fetch('/photos')
-        .then(res => res.json())
-        .then(data => {
-            data.data.forEach(photo => {
-                const img = document.createElement('img');
-                img.setAttribute('defer', true);
-                img.classList.add('lazy');
-                img.style.opacity = 0;
-                img.setAttribute('data-src', photo.thumbnailUrl);
+            const buildPage = async () => {
+                console.time('render dom tree');
+                let sumTime = 0;
 
-                main.appendChild(img);
-            });
+                for (let i = 1; i < 101; i++) {
+                    const s = Date.now();
 
-            console.timeEnd('render dom tree');
-        })
-        .then(() => {
-            lazyLoad();
-        })
-        .catch(err => console.log(err))
-    }
+                    await fetch(`/photos/${i}`)
+                        .then((res) => res.json())
+                        .then((data) => {
+                            const d = Date.now() - s;
 
+                            const time = document.createElement('div');
+                            time.classList.add('image');
+                            time.innerHTML = `<div class="time">${d} ms</div>`;
 
+                            const img = document.createElement('img');
+                            img.setAttribute('defert', true);
+                            img.setAttribute('src', data.thumbnailUrl);
+                            time.appendChild(img);
+                            main.appendChild(time);
+                            sumTime += d;
+                            return d;
+                        })
+                        .catch((err) => console.log(err));
+                }
+                sum.innerHTML = `total: ${sumTime / 1000} s`;
+                sum.style.opacity = 1;
 
-    function lazyLoad() {
-	const lazyImages = [].slice.call(document.querySelectorAll('img.lazy'));
-	if (lazyImages.length == 0) return;
-
-	const lazyImageObserver = new IntersectionObserver((entries, observer) => {
-		entries.forEach(function (entry) {
-			if (entry.isIntersecting) {
-				const lazyImage = entry.target;
-				lazyImage.src = lazyImage.dataset.src;
-				lazyImage.classList.remove('lazy');
-				lazyImageObserver.unobserve(lazyImage);
-				lazyImage.style.opacity = 1;
-			}
-		});
-	});
-
-	lazyImages.forEach((lazyImage) => {
-		lazyImageObserver.observe(lazyImage);
-	});
-}
-    buildPage();
-    
-    </script>
-</body>
+                console.timeEnd('render dom tree');
+            };
+            buildPage();
+        </script>
+    </body>
 </html>
