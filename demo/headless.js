@@ -80,6 +80,7 @@ const buildPage = () => {
             new Promise(async (resolve, reject) => {
                 await axios(`/photos/${i}`)
                     .then((data) => {
+                        console.log(`time for single image: ${data.time} ms`);
                         resolve();
                     })
                     .catch((err) => {
@@ -90,11 +91,8 @@ const buildPage = () => {
     }
 
     Promise.all(allPromises).then((durations) => {
-        sum.innerHTML = `total: ${((Date.now() - s) / 1000).toFixed(2)} s`;
-        sum.style.opacity = 1;
+        console.log(`total time for all images: ${((Date.now() - s) / 1000).toFixed(2)} s`);
     });
-
-    console.timeEnd('render dom tree');
 };
 
 buildPage();
