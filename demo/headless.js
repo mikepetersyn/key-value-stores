@@ -44,7 +44,7 @@ const getPhoto = (id) => {
             if (error) console.log(error);
             if (photos) {
                 const d = Date.now() - s;
-                resolve({ time: d, photo: JSON.parse(photos) });
+                resolve({ time: d, photo: JSON.parse(photos), cached: true });
             }
 
             const { data } = await axios.get(
@@ -59,7 +59,7 @@ const getPhoto = (id) => {
             }, default_expiration * 1000);
 
             const d2 = Date.now() - s;
-            resolve({ time: d2, photo: data });
+            resolve({ time: d2, photo: data, cached: false });
         });
     });
 };
@@ -72,7 +72,9 @@ const buildPage = () => {
             new Promise((resolve, reject) => {
                 getPhoto(i)
                     .then((data) => {
-                        console.log(`time for single image: ${data.time} ms`);
+                        console.log(
+                            `time for single image: ${data.time} ms | cached: ${data.cached}`
+                        );
                         resolve();
                     })
                     .catch((err) => {
@@ -83,7 +85,7 @@ const buildPage = () => {
     }
 
     Promise.all(allPromises).then((durations) => {
-        console.log(`total time for all images: ${((Date.now() - s) / 1000).toFixed(2)} s`);
+        console.log(`total time for all images: ${Date.now() - s} ms`);
     });
 };
 
