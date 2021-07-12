@@ -1,7 +1,4 @@
-const express = require('express');
-const app = express();
 const axios = require('axios');
-
 const RedisClustr = require('redis-clustr');
 const redisClient = new RedisClustr({
     servers: [
@@ -34,16 +31,12 @@ const redisClient = new RedisClustr({
 
 const default_expiration = 120;
 
-app.use(express.static('public'));
-
 redisClient.on('connect', () => {
     console.error('connected to redis-server');
 });
 
-app.get('/photos/:albumId', (req, res) => {
-    //console.time('response duration');
-
-    const albumId = req.params.albumId;
+const getPhoto = async (id) => {
+    const albumId = id;
     const s = Date.now();
 
     redisClient.get(`albumId?${albumId}`, async (error, photos) => {
@@ -52,7 +45,7 @@ app.get('/photos/:albumId', (req, res) => {
             // console.log('\nCACHED. Found data on redis-server');
             // console.timeEnd('response duration');
             const d = Date.now() - s;
-            return res.json({ time: d, photo: JSON.parse(photos) });
+            return { time: d, photo: JSON.parse(photos) };
         }
 
         const { data } = await axios.get(`https://jsonplaceholder.typicode.com/photos/${albumId}`);
@@ -68,9 +61,9 @@ app.get('/photos/:albumId', (req, res) => {
         }, default_expiration * 1000);
 
         const d2 = Date.now() - s;
-        return res.json({ time: d2, photo: data });
+        return { time: d2, photo: data };
     });
-});
+};
 
 const buildPage = () => {
     const s = Date.now();
@@ -78,15 +71,9 @@ const buildPage = () => {
     for (let i = 1; i < 101; i++) {
         allPromises.push(
             new Promise(async (resolve, reject) => {
-                await axios
-                    .get(`/photos/${i}`)
-                    .then((data) => {
-                        console.log(`time for single image: ${data.time} ms`);
-                        resolve();
-                    })
-                    .catch((err) => {
-                        reject(err);
-                    });
+                const data = await getPhoto(i);
+                console.log(`time for single image: ${data.time} ms`);
+                resolve();
             })
         );
     }
@@ -95,10 +82,5 @@ const buildPage = () => {
         console.log(`total time for all images: ${((Date.now() - s) / 1000).toFixed(2)} s`);
     });
 };
-
-app.listen(3000, () => {
-    console.log('REDIS DEMO with caching');
-    console.log('reachable via http://localhost:3000');
-});
 
 buildPage();
