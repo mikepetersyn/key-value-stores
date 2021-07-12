@@ -70,6 +70,7 @@ const buildPage = () => {
 
     Promise.all(allPromises).then((durations) => {
         console.log(`total time for all images: ${Date.now() - sAll} ms`);
+        process.exit();
     });
 };
 
