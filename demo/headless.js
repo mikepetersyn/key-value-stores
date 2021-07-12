@@ -96,9 +96,9 @@ const buildPage = () => {
     });
 };
 
-buildPage();
-
 app.listen(3000, () => {
     console.log('REDIS DEMO with caching');
     console.log('reachable via http://localhost:3000');
 });
+
+buildPage();
