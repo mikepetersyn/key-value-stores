@@ -43,8 +43,6 @@ const getPhoto = (id) => {
         redisClient.get(`albumId?${albumId}`, async (error, photos) => {
             if (error) console.log(error);
             if (photos) {
-                // console.log('\nCACHED. Found data on redis-server');
-                // console.timeEnd('response duration');
                 const d = Date.now() - s;
                 resolve({ time: d, photo: JSON.parse(photos) });
             }
@@ -55,9 +53,6 @@ const getPhoto = (id) => {
 
             // save response to redis
             redisClient.setex(`albumId?${albumId}`, default_expiration, JSON.stringify(data));
-
-            // console.log('\nNOT CACHED. Requesting data from API');
-            // console.timeEnd('response duration');
 
             setTimeout(() => {
                 console.log(`\n"albumId?${albumId}" expired: REMOVED from redis-server`);
@@ -77,7 +72,6 @@ const buildPage = () => {
             new Promise((resolve, reject) => {
                 getPhoto(i)
                     .then((data) => {
-                        console.log(data);
                         console.log(`time for single image: ${data.time} ms`);
                         resolve();
                     })
