@@ -35,57 +35,45 @@ redisClient.on('connect', () => {
     console.error('connected to redis-server');
 });
 
-const getPhoto = (id) => {
-    return new Promise((resolve, reject) => {
-        const albumId = id;
-        const s = Date.now();
-
-        redisClient.get(`albumId?${albumId}`, async (error, photos) => {
-            if (error) console.log(error);
-            if (photos) {
-                const d = Date.now() - s;
-                resolve({ time: d, photo: JSON.parse(photos), cached: true });
-            }
-
-            const { data } = await axios.get(
-                `https://jsonplaceholder.typicode.com/photos/${albumId}`
-            );
-
-            // save response to redis
-            redisClient.setex(`albumId?${albumId}`, default_expiration, JSON.stringify(data));
-
-            setTimeout(() => {
-                console.log(`\n"albumId?${albumId}" expired: REMOVED from redis-server`);
-            }, default_expiration * 1000);
-
-            const d2 = Date.now() - s;
-            resolve({ time: d2, photo: data, cached: false });
-        });
-    });
-};
-
 const buildPage = () => {
-    const s = Date.now();
+    const sAll = Date.now();
     const allPromises = [];
+
     for (let i = 1; i < 101; i++) {
         allPromises.push(
             new Promise((resolve, reject) => {
-                getPhoto(i)
-                    .then((data) => {
-                        console.log(
-                            `time for single image: ${data.time} ms | cached: ${data.cached}`
-                        );
+                const s = Date.now();
+                redisClient.get(`albumId?${albumId}`, async (error, photos) => {
+                    if (error) console.log(error);
+                    if (photos) {
+                        console.log(`time for single image: ${Date.now() - s} ms | cached: true`);
                         resolve();
-                    })
-                    .catch((err) => {
-                        reject(err);
-                    });
+                    }
+
+                    const { data } = await axios.get(
+                        `https://jsonplaceholder.typicode.com/photos/${albumId}`
+                    );
+
+                    // save response to redis
+                    redisClient.setex(
+                        `albumId?${albumId}`,
+                        default_expiration,
+                        JSON.stringify(data)
+                    );
+
+                    setTimeout(() => {
+                        console.log(`\n"albumId?${albumId}" expired: REMOVED from redis-server`);
+                    }, default_expiration * 1000);
+
+                    console.log(`time for single image: ${Date.now() - s} ms | cached: false`);
+                    resolve();
+                });
             })
         );
     }
 
     Promise.all(allPromises).then((durations) => {
-        console.log(`total time for all images: ${Date.now() - s} ms`);
+        console.log(`total time for all images: ${Date.now() - sAll} ms`);
     });
 };
 
