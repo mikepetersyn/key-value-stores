@@ -78,7 +78,8 @@ const buildPage = () => {
     for (let i = 1; i < 101; i++) {
         allPromises.push(
             new Promise(async (resolve, reject) => {
-                await axios(`/photos/${i}`)
+                await axios
+                    .get(`/photos/${i}`)
                     .then((data) => {
                         console.log(`time for single image: ${data.time} ms`);
                         resolve();
