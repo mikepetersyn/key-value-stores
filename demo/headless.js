@@ -72,6 +72,8 @@ const buildPage = () => {
         allPromises.push(
             new Promise(async (resolve, reject) => {
                 const data = await getPhoto(i);
+                console.log(data);
+
                 console.log(`time for single image: ${data.time} ms`);
                 resolve();
             })
