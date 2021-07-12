@@ -43,7 +43,7 @@ const buildPage = () => {
         allPromises.push(
             new Promise((resolve, reject) => {
                 const s = Date.now();
-                redisClient.get(`albumId?${albumId}`, async (error, photos) => {
+                redisClient.get(`albumId?${i}`, async (error, photos) => {
                     if (error) console.log(error);
                     if (photos) {
                         console.log(`time for single image: ${Date.now() - s} ms | cached: true`);
@@ -51,18 +51,14 @@ const buildPage = () => {
                     }
 
                     const { data } = await axios.get(
-                        `https://jsonplaceholder.typicode.com/photos/${albumId}`
+                        `https://jsonplaceholder.typicode.com/photos/${i}`
                     );
 
                     // save response to redis
-                    redisClient.setex(
-                        `albumId?${albumId}`,
-                        default_expiration,
-                        JSON.stringify(data)
-                    );
+                    redisClient.setex(`albumId?${i}`, default_expiration, JSON.stringify(data));
 
                     setTimeout(() => {
-                        console.log(`\n"albumId?${albumId}" expired: REMOVED from redis-server`);
+                        console.log(`\n"albumId?${i}" expired: REMOVED from redis-server`);
                     }, default_expiration * 1000);
 
                     console.log(`time for single image: ${Date.now() - s} ms | cached: false`);
