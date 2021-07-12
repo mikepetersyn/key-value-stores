@@ -81,7 +81,7 @@ Jul 2021 - Accepted 127.0.0.1:52370
 Jul 2021 - 1 clients connected (0 replicas), 817024 bytes in use
 
 ```
-# 3. Redis exercise
+# 3. Redis exercise 1
 This will help getting acquainted with the most comman redis-commands. Everytime you'll begin typing a command, redis-cli will come up with suggestions how to complete the request.
 
 If you start typing **set** this will expanded to the followering:
@@ -159,5 +159,59 @@ setex hw 120 'Hello World'
 ```
 Use *ttl hw* to check the TTL of the key hw. This time for the next 120 seconds this should results *(integer) any number between 0 - 120 seconds*
 
+# 4. Redis exercise 2 - Cluster
+Now will change the running redis-server to be able to act as a part of a redis-cluster 
 
+## 4.1 Creating the redis.config
+To act as cluster-node some additonal config-parameter are needed. We will create our own redis.config file. Maybe you'll use the beloved nano editor for that, than the command will look like:
+```
+nano redis.conf
+```
+Copy-Past the following parameters into the redis.config file and save it to disk.
+```
+port 7000
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+appendonly yes
+protected-mode no
+```
+
+## 4.2 Running redis-server in cluster mode
+To start redis-server using the previously created config-file you just use it as first parameter:
+```
+redis-server redis.config
+```
+
+You should get an output similar to that:
+```
+Jul 2021 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+Jul 2021 # Redis version=5.0.7, bits=64, commit=00000000, modified=0, pid=18074
+Jul 2021 # Configuration loaded
+Jul 2021 * Increased maximum number of open files to 10032
+Jul 2021 * No cluster configuration found, I'm 5f5355e6cfba74817d23356ba018165de6e3f8e4
+                _._                                                  
+           _.-``__ ''-._                                             
+      _.-``    `.  `_.  ''-._           Redis 5.0.7 (00000000/0) 64 bit
+  .-`` .-```.  ```\/    _.,_ ''-._                                   
+ (    '      ,       .-`  | `,    )     Running in cluster mode
+ |`-._`-...-` __...-.``-._|'` _.-'|     Port: 7000
+ |    `-._   `._    /     _.-'    |     PID: 18074
+  `-._    `-._  `-./  _.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |           http://redis.io        
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+ |`-._`-._    `-.__.-'    _.-'_.-'|                                  
+ |    `-._`-._        _.-'_.-'    |                                  
+  `-._    `-._`-.__.-'_.-'    _.-'                                   
+      `-._    `-.__.-'    _.-'                                       
+          `-._        _.-'                                           
+              `-.__.-'                                               
+
+Jul 2021 # Server initialized
+```
+Please notice that it's saying: *Running in cluster mode* and that there is an ID: *I'm 5f5355e6cfba74817d23356ba018165de6e3f8e4* which is the unique address for this node.
+
+## 4.3 Wait for your colleagues
+If you have setup redis-server as shown at 4.2 you have to wait for you colleagues the reach that status as well. If all your cluster-nodes are running, we will go on and finally connect them to one big cluster communicating to each other.
 
