@@ -177,6 +177,17 @@ appendonly yes
 protected-mode no
 ```
 
+
+| Parameter | Explanation |
+| -------- | -------- |
+| port 7000     | the port on which the client is reachable     |
+| cluster-enabled yes     | enables redis-server running in cluster mode     |
+| cluster-config-file nodes.conf     | Every Redis Cluster node requires a different cluster configuration file     |
+| cluster-node-timeout 5000     | amount of milliseconds a node must be unreachable for it to be considered in failure state     |
+| appendonly yes     | enables an alternative persistence mode that provides much better durability |
+| protected-mode no     | allows clients from other host to communicate to each other     |
+
+
 ## 4.2 Running redis-server in cluster mode
 To start redis-server using the previously created config-file you just use it as first parameter:
 ```
@@ -209,9 +220,135 @@ Jul 2021 * No cluster configuration found, I'm 5f5355e6cfba74817d23356ba018165de
               `-.__.-'                                               
 
 Jul 2021 # Server initialized
+Jul 2021 * Ready to accept connections
 ```
 Please notice that it's saying: *Running in cluster mode* and that there is an ID: *I'm 5f5355e6cfba74817d23356ba018165de6e3f8e4* which is the unique address for this node.
 
 ## 4.3 Wait for your colleagues
 If you have setup redis-server as shown at 4.2 you have to wait for you colleagues the reach that status as well. If all your cluster-nodes are running, we will go on and finally connect them to one big cluster communicating to each other.
 
+## 4.4 Create the redis-cluster
+After all your single nodes are running properly, we will now create the cluster. **This will be done by only one your group members**. So please coordinate yourselves well who of you will do this. The following outputs will also only visible for the team member that's selected to create the cluster.
+
+Each redis-node is reachable via the unique ip-address of the machine it's running on. To create you cluster use the command *redis-cli --cluster create* followed by a list of all you ip-addresses and there ports.
+
+Example command for pcs pc01, pc02, pc03, pc04, pc05 and pc06
+
+```
+redis-cli --cluster create \
+192.168.75.21:7000 \
+192.168.75.22:7000 \
+192.168.75.23:7000 \
+192.168.75.24:7000 \
+192.168.75.25:7000 \
+192.168.75.26:7000 \
+--cluster-replicas 1
+```
+
+After runnign this command **three master nodes** as well as **three replica nodes** should be created. Please confirm the proposed configuration with *YES*.
+(Ip-Addresses may and IDs will be different to this example output)
+```
+>>> Performing hash slots allocation on 6 nodes...
+Master[0] -> Slots 0 - 5460
+Master[1] -> Slots 5461 - 10922
+Master[2] -> Slots 10923 - 16383
+Adding replica 192.168.75.25:7000 to 192.168.75.21:7000
+Adding replica 192.168.75.26:7000 to 192.168.75.22:7000
+Adding replica 192.168.75.24:7000 to 192.168.75.23:7000
+
+M: 6289162b2a785b0659ecbf48fa46ba3e301bb0ac 192.168.75.21:7000
+   slots:[0-5460] (5461 slots) master
+M: 19c0e8512ca8f24f07b5832f73954b430154fc74 192.168.75.22:7000
+   slots:[5461-10922] (5462 slots) master
+M: 5f5355e6cfba74817d23356ba018165de6e3f8e4 192.168.75.23:7000
+   slots:[10923-16383] (5461 slots) master
+S: f9764fda0a554e801274ca1264472d54bbc8f53b 192.168.75.24:7000
+   replicates 5f5355e6cfba74817d23356ba018165de6e3f8e4
+S: f755d2ea17a59bcc8acaea4950126f6089f7193c 192.168.75.25:7000
+   replicates 6289162b2a785b0659ecbf48fa46ba3e301bb0ac
+S: a7accc10d8349fc0bc6569f7b305bcd994f5298b 192.168.75.26:7000
+   replicates 19c0e8512ca8f24f07b5832f73954b430154fc74
+   
+Can I set the above configuration? (type 'yes' to accept): 
+```
+
+If the configuration was successfull the following out is shown.
+```
+>>> Nodes configuration updated
+>>> Assign a different config epoch to each node
+>>> Sending CLUSTER MEET messages to join the cluster
+Waiting for the cluster to join
+..
+>>> Performing Cluster Check (using node 192.168.75.21:7000)
+M: 6289162b2a785b0659ecbf48fa46ba3e301bb0ac 192.168.75.21:7000
+   slots:[0-5460] (5461 slots) master
+   1 additional replica(s)
+M: 19c0e8512ca8f24f07b5832f73954b430154fc74 192.168.75.22:7000
+   slots:[5461-10922] (5462 slots) master
+   1 additional replica(s)
+S: f9764fda0a554e801274ca1264472d54bbc8f53b 192.168.75.24:7000
+   slots: (0 slots) slave
+   replicates 5f5355e6cfba74817d23356ba018165de6e3f8e4
+S: f755d2ea17a59bcc8acaea4950126f6089f7193c 192.168.75.25:7000
+   slots: (0 slots) slave
+   replicates 6289162b2a785b0659ecbf48fa46ba3e301bb0ac
+M: 5f5355e6cfba74817d23356ba018165de6e3f8e4 192.168.75.23:7000
+   slots:[10923-16383] (5461 slots) master
+   1 additional replica(s)
+S: a7accc10d8349fc0bc6569f7b305bcd994f5298b 192.168.75.26:7000
+   slots: (0 slots) slave
+   replicates 19c0e8512ca8f24f07b5832f73954b430154fc74
+   
+[OK] All nodes agree about slots configuration.
+>>> Check for open slots...
+>>> Check slots coverage...
+[OK] All 16384 slots covered.
+
+```
+
+All team members should see an output similar to this.
+
+**If your node has become a master node:**
+```
+Jul 2021 # configEpoch set to 6 via CLUSTER SET-CONFIG-EPOCH
+Jul 2021 # IP address for this node updated to 192.168.75.26
+Jul 2021 * Before turning into a replica, using my master parameters to synthesize a cached master: I may be able to synchronize with the new master with just a partial transfer.
+Jul 2021 # Cluster state changed: ok
+Jul 2021 * Connecting to MASTER 192.168.75.22:7000
+Jul 2021 * MASTER <-> REPLICA sync started
+Jul 2021 * Non blocking connect for SYNC fired the event.
+Jul 2021 * Master replied to PING, replication can continue...
+Jul 2021 * Trying a partial resynchronization (request 7624d57eefcf05381154ecb03ef4f6f018524964:1).
+Jul 2021 * Full resync from master: 4fcedcfd240f9e1e9b62c73866d2428d72b1ff92:0
+Jul 2021 * Discarding previously cached master state.
+Jul 2021 * MASTER <-> REPLICA sync: receiving 175 bytes from master
+Jul 2021 * MASTER <-> REPLICA sync: Flushing old data
+Jul 2021 * MASTER <-> REPLICA sync: Loading DB in memory
+Jul 2021 * MASTER <-> REPLICA sync: Finished with success
+Jul 2021 * Background append only file rewriting started by pid 19927
+Jul 2021 * AOF rewrite child asks to stop sending diffs.
+Jul 2021 * Parent agreed to stop sending diffs. Finalizing AOF...
+Jul 2021 * Concatenating 0.00 MB of AOF diff received from parent.
+Jul 2021 * SYNC append only file rewrite performed
+Jul 2021 * AOF rewrite: 0 MB of memory used by copy-on-write
+Jul 2021 * Background AOF rewrite terminated with success
+Jul 2021 * Residual parent diff successfully flushed to the rewritten AOF (0.00 MB)
+Jul 2021 * Background AOF rewrite finished successfully
+```
+
+
+**If your node has become a replica node:**
+```
+Jul 2021 # configEpoch set to 1 via CLUSTER SET-CONFIG-EPOCH
+Jul 2021 # IP address for this node updated to 192.168.75.21
+Jul 2021 * Replica 192.168.75.25:7000 asks for synchronization
+Jul 2021 * Partial resynchronization not accepted: Replication ID mismatch (Replica asked for '21a5523027209531acebef590d4b063a60271c54', my replication IDs are '6a94bd0a2299a48751fe08d8a80c1254eb16b879' and '0000000000000000000000000000000000000000')
+
+Jul 2021 * Starting BGSAVE for SYNC with target: disk
+Jul 2021 * Background saving started by pid 19109
+Jul 2021 * DB saved on disk
+Jul 2021 * RDB: 0 MB of memory used by copy-on-write
+Jul 2021 * Background saving terminated with success
+Jul 2021 * Synchronization with replica 192.168.75.25:7000 succeeded
+Jul 2021 # Cluster state changed: ok
+```
