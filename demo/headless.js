@@ -47,7 +47,7 @@ const buildPage = () => {
                     if (error) console.log(error);
                     if (photos) {
                         console.log(`time for single image: ${Date.now() - s} ms | cached: true`);
-                        resolve();
+                        return resolve();
                     }
 
                     const { data } = await axios.get(
@@ -62,7 +62,7 @@ const buildPage = () => {
                     }, default_expiration * 1000);
 
                     console.log(`time for single image: ${Date.now() - s} ms | cached: false`);
-                    resolve();
+                    return resolve();
                 });
             })
         );
