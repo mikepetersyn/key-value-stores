@@ -39,7 +39,7 @@ const buildPage = () => {
     const sAll = Date.now();
     const allPromises = [];
 
-    for (let i = 1; i < 101; i++) {
+    for (let i = 1; i < 501; i++) {
         allPromises.push(
             new Promise((resolve, reject) => {
                 const s = Date.now();
