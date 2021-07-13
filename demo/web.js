@@ -14,17 +14,14 @@ redisClient.on('connect', () => {
 });
 
 app.get('/photos/:albumId', (req, res) => {
-    //console.time('response duration');
-
     const albumId = req.params.albumId;
     const s = Date.now();
 
     redisClient.get(`albumId?${albumId}`, async (error, photos) => {
         if (error) console.log(error);
         if (photos) {
-            console.log('\nCACHED. Found data on redis-server');
-            //console.timeEnd('response duration');
-            const d = Date.now() - s;
+                        const d = Date.now() - s;
+            console.log(`time for single image: ${d} ms | cached: true`);
             return res.json({ time: d, photo: JSON.parse(photos) });
         }
 
@@ -33,14 +30,12 @@ app.get('/photos/:albumId', (req, res) => {
         // save response to redis
         redisClient.setex(`albumId?${albumId}`, default_expiration, JSON.stringify(data));
 
-        console.log('\nNOT CACHED. Requesting data from API');
-        //console.timeEnd('response duration');
-
         setTimeout(() => {
-            console.log('\n"photos" expired: REMOVED FROM redis-server');
+            console.log(`albumId?${albumId} expired: REMOVED FROM redis-server`);
         }, default_expiration * 1000);
 
         const d2 = Date.now() - s;
+        console.log(`time for single image: ${d2} ms | cached: false`);
         return res.json({ time: d2, photo: data });
     });
 });
