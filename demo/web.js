@@ -2,23 +2,8 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 
-const RedisClustr = require('redis-clustr');
-const redisClient = new RedisClustr({
-    servers: [
-        {
-            host: '127.0.0.1',
-            port: 7000,
-        },
-        {
-            host: '127.0.0.1',
-            port: 7001,
-        },
-        {
-            host: '127.0.0.1',
-            port: 7002,
-        },
-    ],
-});
+const RedisClustr = require('redis');
+const redisClient = RedisClustr.createClient()
 
 const default_expiration = 120;
 
