@@ -54,7 +54,7 @@ const buildPage = () => {
         );
     }
 
-    Promise.all(allPromises).then((durations) => {
+    Promise.all(allPromises).then(() => {
         console.log(`total time for all images: ${Date.now() - sAll} ms`);
         process.exit();
     });

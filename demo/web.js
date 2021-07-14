@@ -3,7 +3,7 @@ const app = express();
 const axios = require('axios');
 
 const RedisClustr = require('redis');
-const redisClient = RedisClustr.createClient()
+const redisClient = RedisClustr.createClient();
 
 const default_expiration = 120;
 
@@ -20,7 +20,7 @@ app.get('/photos/:albumId', (req, res) => {
     redisClient.get(`albumId?${albumId}`, async (error, photos) => {
         if (error) console.log(error);
         if (photos) {
-                        const d = Date.now() - s;
+            const d = Date.now() - s;
             console.log(`time for single image: ${d} ms | cached: true`);
             return res.json({ time: d, photo: JSON.parse(photos) });
         }
