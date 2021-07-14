@@ -1,23 +1,20 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
-
 const RedisClustr = require('redis-clustr');
+
+require('dotenv').config();
+
+const servers = [];
+for (let i = 1; i >= process.env.NODES; i++) {
+    servers.push({
+        host: `process.env.NODE${i}`,
+        port: 7000,
+    });
+}
+
 const redisClient = new RedisClustr({
-    servers: [
-        {
-            host: '127.0.0.1',
-            port: 7000,
-        },
-        {
-            host: '127.0.0.1',
-            port: 7001,
-        },
-        {
-            host: '127.0.0.1',
-            port: 7002,
-        },
-    ],
+    servers: servers,
 });
 
 const default_expiration = 30;
