@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 const RedisClustr = require('redis-clustr');
+const Redis = require('redis');
 
 require('dotenv').config();
 
@@ -15,12 +16,21 @@ for (let i = 1; i <= process.env.NODES; i++) {
 
 const redisClient = new RedisClustr({
     servers: servers,
+    createClient: function (port, host) {
+        console.log(`Connecting to ${host} on port ${port}`);
+        return Redis.createClient(port, host);
+    },
 });
 
 const default_expiration = 30;
 
 redisClient.on('connect', () => {
     console.error('connected to redis-server');
+});
+
+redisClient.on('error', (channel, message) => {
+    console.log(channel);
+    console.log(message);
 });
 
 app.get('/', (req, res) => {
@@ -55,6 +65,6 @@ app.get('/photos', (req, res) => {
 });
 
 app.listen(3000, () => {
-    console.log('REDIS DEMO with caching');
+    console.log('\nREDIS DEMO with caching');
     console.log('reachable via http://localhost:3000');
 });

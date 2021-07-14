@@ -1,10 +1,11 @@
 const axios = require('axios');
 const RedisClustr = require('redis-clustr');
+const Redis = require('redis');
 
 require('dotenv').config();
 
 const servers = [];
-for (let i = 1; i >= process.env.NODES; i++) {
+for (let i = 1; i <= process.env.NODES; i++) {
     servers.push({
         host: process.env[`NODE${i}`],
         port: 7000,
@@ -13,12 +14,21 @@ for (let i = 1; i >= process.env.NODES; i++) {
 
 const redisClient = new RedisClustr({
     servers: servers,
+    createClient: function (port, host) {
+        console.log(`Connecting to ${host} on port ${port}`);
+        return Redis.createClient(port, host);
+    },
 });
 
 const default_expiration = 120;
 
 redisClient.on('connect', () => {
     console.error('connected to redis-server');
+});
+
+redisClient.on('error', (channel, message) => {
+    console.log(channel);
+    console.log(message);
 });
 
 const buildPage = () => {
@@ -60,4 +70,7 @@ const buildPage = () => {
     });
 };
 
-buildPage();
+console.log('\nrequesting images in 5 seconds');
+setTimeout(() => {
+    buildPage();
+}, 5000);
