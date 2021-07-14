@@ -6,7 +6,7 @@ require('dotenv').config();
 const servers = [];
 for (let i = 1; i >= process.env.NODES; i++) {
     servers.push({
-        host: `process.env.NODE${i}`,
+        host: process.env[`NODE${i}`],
         port: 7000,
     });
 }
@@ -25,7 +25,7 @@ const buildPage = () => {
     const sAll = Date.now();
     const allPromises = [];
 
-    for (let i = 1; i < 501; i++) {
+    for (let i = 1; i < 301; i++) {
         allPromises.push(
             new Promise((resolve, reject) => {
                 const s = Date.now();

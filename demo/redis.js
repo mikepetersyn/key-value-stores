@@ -6,9 +6,9 @@ const RedisClustr = require('redis-clustr');
 require('dotenv').config();
 
 const servers = [];
-for (let i = 1; i >= process.env.NODES; i++) {
+for (let i = 1; i <= process.env.NODES; i++) {
     servers.push({
-        host: `process.env.NODE${i}`,
+        host: process.env[`NODE${i}`],
         port: 7000,
     });
 }
