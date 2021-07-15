@@ -38,7 +38,7 @@ You should get this as output:
 ```
 redis 127.0.0.1:6379>
 ```
-You'are no working directly on the redis-server.
+You're now working directly on the redis-server.
 
 ---
 
@@ -47,7 +47,6 @@ This will help getting familiar with the most commands redis-commands. Everytime
 
 If you start typing **set** this will expanded to the followering:
 ```
-demo@ubuntu:~$ redis-cli
 127.0.0.1:6379> set key value [expiration EX seconds|PX milliseconds] [NX|XX]
 ```
 
@@ -134,7 +133,7 @@ Use *ttl hw* to check the TTL of the key hw. This time for the next 120 seconds 
 Now will change the running redis-server to be able to act as a part of a redis-cluster 
 
 ## 4.1 Creating the redis.config
-To act as cluster-node some additonal config-parameter are needed. We will create our own redis.config file. Maybe you'll use the beloved nano editor for that, than the command will look like:
+To act as cluster-node some additonal config-parameter are needed. We will create our own redis.config file. Maybe you'll use the beloved nano editor for that ;) , than the command will look like:
 ```
 nano redis.conf
 ```
