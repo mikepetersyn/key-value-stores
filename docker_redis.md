@@ -121,45 +121,30 @@ To add new nodes to the cluster, you need to start new containers. For this you 
 
 Example: `-p 8443:8443` is already taken by redis-node1. Try something like `-p 8444:8443` etc.
 
+## 3.2 Join Nodes to Cluster
 
+Go to your browser and type in the url for the web admin console `https://localhost:844x`. For your new nodes, do the following steps to add them to the cluster:
 
+1. Click “Setup”
+2. In cluster configuration, select “Join Cluster”,
+3. Enter the IP address of the first node, 172.17.0.2 in my environment
+4. Enter the credentials you have used during the installation of the first node.
+5. Click “Next”
+
+After a few seconds, you will be redirected to the home page and see the list of nodes of your cluster.
+
+Repeat the same steps for the third node.
+
+## 3.3 Use Your Redis Cluster
+
+Get creative or use the demo from the exercises that were given during class :-).
+
+---
 
 ## Sources
 
 [Docker Installation](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
 
 [Redis Installation and Configuration](http://tgrall.github.io/blog/2019/09/05/multi-nodes-redis-cluster-with-docker/)
-
-
----
-
-# 4. Caching Demo based on Node-Application and redis
-The demo folder contains to applications: pure.js and redis.js which showcases the durations of an api-request with and without caching.
-
-## 4.1 Install dependencies
-- install all needed dependencies: git to clone the repo, nodejs and npm to run the node-applications and redis to start a local redis-server for caching.
-```
-sudo apt install git nodejs npm redis -y
-```
-
-- clone the repository and install dependencies
-```
-git clone https://github.com/mikeptrsn/key-value-stores.git &&
-cd key-value-stores/demo &&
-npm i
-```
-
-| Command | Description |
-| --------: | :---------- |
-| `npm run pure` | starts the pure demo without caching |
-| `npm run redis` | starts the redis demo with caching |
-
-Both services are available via http://localhost:3000
-
-| Route | Description |
-| --------: | :---------- |
-| `/photos` | requests meta-data of 5000 photos from https://jsonplaceholder.typicode.com |
-
-Example: Open http://localhost:3000/photos in the Browser
 
 ---
