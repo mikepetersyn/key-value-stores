@@ -42,7 +42,7 @@ const buildPage = () => {
                 redisClient.get(`albumId?${i}`, async (error, photos) => {
                     if (error) console.log(error);
                     if (photos) {
-                        console.log(`time for single image: ${Date.now() - s} ms | cached: true`);
+                        console.log(`cached: true | time for single image: ${Date.now() - s} ms`);
                         return resolve();
                     }
 
@@ -57,7 +57,7 @@ const buildPage = () => {
                         console.log(`\n"albumId?${i}" expired: REMOVED from redis-server`);
                     }, default_expiration * 1000);
 
-                    console.log(`time for single image: ${Date.now() - s} ms | cached: false`);
+                    console.log(`cached: false | time for single image: ${Date.now() - s} ms`);
                     return resolve();
                 });
             })
