@@ -167,7 +167,7 @@ To act as cluster-node some additonal config-parameter are needed. We will creat
 ```
 nano redis.conf
 ```
-Copy-Past the following parameters into the redis.config file and save it to disk.
+Copy-Past the following parameters into the redis.config file and save it to disk. Please help each other with questions.
 ```
 port 7000
 cluster-enabled yes
@@ -352,3 +352,63 @@ Jul 2021 * Background saving terminated with success
 Jul 2021 * Synchronization with replica 192.168.75.25:7000 succeeded
 Jul 2021 # Cluster state changed: ok
 ```
+
+# 5. Run a real-world application on you cluster
+ Each team member should do this part for themselves. To keep you clustern running it's important to **not close the terminal / window** your node in running at!
+
+## 5.1 Establish a second connection to LinuxLab
+You have to establish a **second connection to the LinuxLab in an seperate terminal / window**. Please use the same pc## you used before (if your node is running on pc01, also establish the second connection to pc01).
+
+## 5.2 Clone the demo application
+We've created a demo application that will retrieve metadata of 300 pictures from https://jsonplaceholder.typicode.com and will cache them for 120 seconds. You have to clone the application from git and install its dependencies. 
+
+| Parameter | Explanation |
+| -------- | -------- |
+| git clone     | clones the repo into a folder called 'key-value-stores'     |
+| cd key-value-stores/demo     | changes directory to 'key-value-stores/demo'     |
+| npm i     | installes all dependencies     |
+
+
+Copy-Paste
+```
+git clone https://github.com/mikeptrsn/key-value-stores.git \
+cd key-value-stores/demo \
+npm i
+```
+
+## 5.3 Configure the demo application
+To connect the application with your redis cluster, all the ip-addresses of the nodes your team is using must be known by the application. There for you have to edit a file named .env
+
+To open the file use (you must be within the key-value-stores/demo folder)
+```
+nano .env
+```
+
+Please change the ip-addresses of NODE1 to NODE6. Save and close the file.
+```
+# total amount of nodes (must be even)
+NODES = 6
+
+# must match the ips of your group
+NODE1 = '192.168.75.##'
+NODE2 = '192.168.75.##'
+NODE3 = '192.168.75.##'
+NODE4 = '192.168.75.##'
+NODE5 = '192.168.75.##'
+NODE6 = '192.168.75.##'
+```
+
+## 5.4 Running the demo application
+Now everything is setup to run the application. The application will run and exit.
+
+Run the application and watch the console logs. You'll see if the request was cached as well as timing informations. Also in the other terminal / window, you redis-node should to some work. Observe this as well.
+
+```
+node demo.js
+```
+
+Rerun the application and compare the console logs. What happened to the caching-state and what to the timing.
+
+1. Discuss what you saw the first and the second run.
+
+2. The observations can be quit different from team member to team member. Discusses the possible reasons for this
