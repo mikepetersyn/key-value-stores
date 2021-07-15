@@ -1,20 +1,18 @@
 # Redis
 
-## Installation and Setup
-To install and run this exercices a linux environment is needed.
+# 1. Log into LinuxLab
+Please establish a connection to the LinuxLab. If you need help with this, take a look at the documentation of 'Vorbereitung der Übung Key-Value Stores' in moodle.
 
-## 1. Installation
-Run the following command and insert password if needed:
-```
-sudo apt install redis -y
-```
+---
 
-## 2. Setup
-### 2.1 Check the status of the service
+# 2. The environment
+Redis is already preinstalled, configured and running in a basic single node setup.
+
+## 2.1 Check the status of redis-server
 ```
 systemctl status redis-server
 ```
-If the service is active and running *Active: active (running)* will be included in the output. Congratulations redis is installed properly.
+If the service is active and running *Active: active (running)* will be included in the output. That means everything is finde and you can go on.
 ```
 ● redis-server.service - Advanced key-value store
      Loaded: loaded (/lib/systemd/system/redis-server.service; enabled; vendor preset: enabled)
@@ -28,61 +26,24 @@ If the service is active and running *Active: active (running)* will be included
              └─976 /usr/bin/redis-server 127.0.0.1:6379
 
 ```
-### 2.2 For this exercice we will **stop** the automatically started service and start it manually afterwards.
 
-Stop the redis-server
-```
-systemctl stop redis-server
-```
 
-### 2.3 Start redis-server manually
-By starting the redis-server manually using the *--loglevel verbose* parameter you'll be able to see all interactions with the server in realtime.
-```
-redis-server --loglevel verbose
-```
-The output should look similar to the followering. If you see a warning like 'WARNING you have Transparent Huge Pages (THP) support enabled in your kernel.' > We will ignore this for now :).
-```
-Jul 2021 # oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
-Jul 2021 # Redis version=5.0.7, bits=64, commit=00000000
-                _._                                                  
-           _.-``__ ''-._                                             
-      _.-``    `.  `_.  ''-._           Redis 5.0.7 (00000000/0) 64 bit
-  .-`` .-```.  ```\/    _.,_ ''-._                                   
- (    '      ,       .-`  | `,    )     Running in standalone mode
- |`-._`-...-` __...-.``-._|'` _.-'|     Port: 6379
- |    `-._   `._    /     _.-'    |     PID: 4111
-  `-._    `-._  `-./  _.-'    _.-'                                   
- |`-._`-._    `-.__.-'    _.-'_.-'|                                  
- |    `-._`-._        _.-'_.-'    |           http://redis.io        
-  `-._    `-._`-.__.-'_.-'    _.-'                                   
- |`-._`-._    `-.__.-'    _.-'_.-'|                                  
- |    `-._`-._        _.-'_.-'    |                                  
-  `-._    `-._`-.__.-'_.-'    _.-'                                   
-      `-._    `-.__.-'    _.-'                                       
-          `-._        _.-'                                           
-              `-.__.-'                                               
-
-Jul 2021 # Server initialized
-Jul 2021 * DB loaded from disk: 0.000 seconds
-Jul 2021 * Ready to accept connections
-Jul 2021 - DB 0: 1 keys (0 volatile) in 4 slots HT.
-Jul 2021 - 0 clients connected (0 replicas), 796184 bytes in use
-```
-
-### 2.4. Connect
-To connect to the previously started redis-server, open another terminal window an run *redis-cli*. This enables you to interact with the redis-server directly.
+### 2.2. Connect to redis-server
+To connect to redis-server, run *redis-cli*. This enables you to interact with the redis-server directly.
 ```
 redis-cli
 ```
-The terminal window running the redis-server will display that a client has connected. Now you are ready the get in touch with the redis commands to set and get key-value-keys.
-```
-Jul 2021 - 0 clients connected (0 replicas), 796136 bytes in use
-Jul 2021 - Accepted 127.0.0.1:52370
-Jul 2021 - 1 clients connected (0 replicas), 817024 bytes in use
 
+You should get this as output:
 ```
-# 3. Redis exercise 1
-This will help getting acquainted with the most comman redis-commands. Everytime you'll begin typing a command, redis-cli will come up with suggestions how to complete the request.
+redis 127.0.0.1:6379>
+```
+You'are no working directly on the redis-server.
+
+---
+
+# 3. Redis exercise 1 - Getting familiar basic commands
+This will help getting familiar with the most commands redis-commands. Everytime you'll begin typing a command, redis-cli will come up with suggestions how to complete the request.
 
 If you start typing **set** this will expanded to the followering:
 ```
@@ -93,11 +54,11 @@ demo@ubuntu:~$ redis-cli
 ## 3.1 Set key-value
 ```
 Syntax:
-set value key
+set key value
 
 Examples:
-set value1 hello
-set value2 world
+set key1 hello
+set key2 world
 ```
 ## 3.2 Get value by key
 ```
@@ -105,11 +66,19 @@ Syntax:
 get key
 
 Examples:
-get value1
-get value2
+get key1
+get key2
 
 ```
-## 3.3 Get all available keys
+## 3.3 Get multiple values at once
+```
+Syntax:
+mget key1 key2 key3
+
+Examples:
+mget key1 key2
+```
+## 3.4 Get all available keys
 ```
 Syntax:
 keys *
@@ -118,7 +87,7 @@ Example:
 keys *
 ```
 
-## 3.4 Remove all key-values from redis-server
+## 3.5 Remove all key-values from redis-server
 ```
 Syntax:
 flushall
@@ -129,7 +98,7 @@ flushall
 
 If you'll check all available keys now again, the result should display *(empty list or set)*.
 
-## 3.4 Set key-value with automatically expiration time
+## 3.6 Set key-value with automatically expiration time
 This example shows that you can choose the key freely. In this case we decided to use *hw* as key. Furthermore as value you can use any kind of string. Because the value in this case consists of two words, you have to wrapped up with single quotes to ensure it as string.
 ```
 Syntax:
@@ -142,7 +111,7 @@ After running *setex hw 30 'Hello World'* the key-value will be stored for 30 se
 
 Try *get hw* to check if the key-value still exists. In case it was deleted the result should show *(nil)*. Try *get hw* over and over again until the key-value is removed.
 
-## 3.5 Check Time-to-Live (TTL)
+## 3.7 Check Time-to-Live (TTL)
 With the ttl command you can check the seconds till a key-value automatically will be removed from the redis-server.
 ```
 Syntax:
@@ -159,7 +128,9 @@ setex hw 120 'Hello World'
 ```
 Use *ttl hw* to check the TTL of the key hw. This time for the next 120 seconds this should results *(integer) any number between 0 - 120 seconds*
 
-# 4. Redis exercise 2 - Cluster
+---
+
+# 4. Redis exercise 2 - Configurate the Cluster
 Now will change the running redis-server to be able to act as a part of a redis-cluster 
 
 ## 4.1 Creating the redis.config
@@ -353,7 +324,9 @@ Jul 2021 * Synchronization with replica 192.168.75.25:7000 succeeded
 Jul 2021 # Cluster state changed: ok
 ```
 
-# 5. Run a real-world application on you cluster
+---
+
+# 5. Redis exercise 3 - Run a real-world application on you cluster
  Each team member should do this part for themselves. To keep you clustern running it's important to **not close the terminal / window** your node in running at!
 
 ## 5.1 Establish a second connection to LinuxLab
@@ -412,3 +385,44 @@ Rerun the application and compare the console logs. What happened to the caching
 1. Discuss what you saw the first and the second run.
 
 2. The observations can be quit different from team member to team member. Discusses the possible reasons for this
+
+---
+
+# 6. Redis exercise 4 - Explore the cluster
+If still some time is left, you can use this to explore the cluster
+
+## 6.1 Connect to your cluster-node
+| Parameter | Explanation |
+| -------- | -------- |
+| -c     | connects to a cluster node     |
+| -p 7000    | port of the cluster node to connect to    |
+
+```
+redis-cli -c -p 7000
+```
+
+## 6.2 Overview over the cluster
+If you're connected to a cluster node you can inspect the environment using the command
+```
+cluster nodes
+```
+You'll get a list of all nodes with the following informations:
+Node ID
+- ip:port
+- flags: master, slave, myself, fail, ...
+- if it is a slave, the Node ID of the master
+- Time of the last pending PING still waiting for a reply
+- Time of the last PONG received
+- Configuration epoch for this node
+- Status of the link to this node
+- Slots served...
+
+
+## 6.3 Annoy the cluster
+Play around with the cluster. Use ***cluster nodes*** command to inspect the changed status of the cluster. For example:
+1. Kill one master, what happens with his replica?
+2. Kill one replica, what happens?
+3. Kill another master, does the cluster still work?
+4. Restart previous killed nodes. How does the cluster react?
+
+---
