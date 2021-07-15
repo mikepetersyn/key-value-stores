@@ -417,8 +417,13 @@ Node ID
 - Status of the link to this node
 - Slots served...
 
+## 6.3 Write and read Key-Values
+1. Write Key-Values
+2. What happens if team members use the same key as well
+3. Get different values by key, inspect the output, something unexpected? 
+4. If 3. delivered something unexpected outputs, can you explain why?
 
-## 6.3 Annoy the cluster
+## 6.4 Annoy the cluster
 Play around with the cluster. Use ***cluster nodes*** command to inspect the changed status of the cluster. For example:
 1. Kill one master, what happens with his replica?
 2. Kill one replica, what happens?
