@@ -1,70 +1,46 @@
 const express = require('express');
 const app = express();
 const axios = require('axios');
-const RedisClustr = require('redis-clustr');
-const Redis = require('redis');
 
-require('dotenv').config();
+const RedisClustr = require('redis');
+const redisClient = RedisClustr.createClient();
 
-const servers = [];
-for (let i = 1; i <= process.env.NODES; i++) {
-    servers.push({
-        host: process.env[`NODE${i}`],
-        port: 7000,
-    });
-}
+const default_expiration = 120;
 
-const redisClient = new RedisClustr({
-    servers: servers,
-    createClient: function (port, host) {
-        console.log(`Connecting to ${host} on port ${port}`);
-        return Redis.createClient(port, host);
-    },
-});
-
-const default_expiration = 30;
+app.use(express.static('public'));
 
 redisClient.on('connect', () => {
     console.error('connected to redis-server');
 });
 
-redisClient.on('error', (channel, message) => {
-    console.log(channel);
-    console.log(message);
-});
+app.get('/photos/:albumId', (req, res) => {
+    const albumId = req.params.albumId;
+    const s = Date.now();
 
-app.get('/', (req, res) => {
-    res.json({ msg: 'Hello from redis demo application' });
-});
-
-app.get('/photos', (req, res) => {
-    console.time('response duration');
-
-    redisClient.get('photos', async (error, photos) => {
+    redisClient.get(`albumId?${albumId}`, async (error, photos) => {
         if (error) console.log(error);
         if (photos) {
-            console.log('\nCACHED. Found data on redis-server');
-            console.timeEnd('response duration');
-            return res.json(JSON.parse(photos));
+            const d = Date.now() - s;
+            console.log(`cached: true | time for single image: ${d} ms`);
+            return res.json({ time: d, photo: JSON.parse(photos) });
         }
 
-        const { data } = await axios.get('https://jsonplaceholder.typicode.com/photos');
+        const { data } = await axios.get(`https://jsonplaceholder.typicode.com/photos/${albumId}`);
 
         // save response to redis
-        redisClient.setex('photos', default_expiration, JSON.stringify(data));
-
-        console.log('\nNOT CACHED. Requesting data from API');
-        console.timeEnd('response duration');
+        redisClient.setex(`albumId?${albumId}`, default_expiration, JSON.stringify(data));
 
         setTimeout(() => {
-            console.log('\n"photos" expired: REMOVED FROM redis-server');
+            console.log(`albumId?${albumId} expired: REMOVED FROM redis-server`);
         }, default_expiration * 1000);
 
-        res.json(data);
+        const d2 = Date.now() - s;
+        console.log(`cached: false | time for single image: ${d2} ms`);
+        return res.json({ time: d2, photo: data });
     });
 });
 
 app.listen(3000, () => {
-    console.log('\nREDIS DEMO with caching');
+    console.log('REDIS DEMO with caching');
     console.log('reachable via http://localhost:3000');
 });

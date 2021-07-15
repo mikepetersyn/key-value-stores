@@ -21,7 +21,7 @@ app.get('/photos/:albumId', (req, res) => {
         if (error) console.log(error);
         if (photos) {
             const d = Date.now() - s;
-            console.log(`time for single image: ${d} ms | cached: true`);
+            console.log(`cached: true | time for single image: ${d} ms`);
             return res.json({ time: d, photo: JSON.parse(photos) });
         }
 
@@ -35,7 +35,7 @@ app.get('/photos/:albumId', (req, res) => {
         }, default_expiration * 1000);
 
         const d2 = Date.now() - s;
-        console.log(`time for single image: ${d2} ms | cached: false`);
+        console.log(`cached: false | time for single image: ${d2} ms`);
         return res.json({ time: d2, photo: data });
     });
 });
