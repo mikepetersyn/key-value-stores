@@ -429,4 +429,7 @@ Play around with the cluster. Use ***cluster nodes*** command to inspect the cha
 3. Kill another master, does the cluster still work?
 4. Restart previous killed nodes. How does the cluster react?
 
+# 7. Homework (Optional):
+If you want to continue to experiment with redis, you can check the docker exercise given in [docker_redis.md](./docker_redis.md). Here, you deploy a multi-node redis cluster on your own machine.
+
 ---
