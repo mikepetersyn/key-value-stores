@@ -202,17 +202,10 @@ After all your single nodes are running properly, we will now create the cluster
 
 Each redis-node is reachable via the unique ip-address of the machine it's running on. To create you cluster use the command *redis-cli --cluster create* followed by a list of all you ip-addresses and there ports.
 
-Example command for pcs pc01, pc02, pc03, pc04, pc05 and pc06
+Example command for six pcs. You only have to change the last two digits ## fitting all the ips of you team
 
 ```
-redis-cli --cluster create \
-192.168.75.21:7000 \
-192.168.75.22:7000 \
-192.168.75.23:7000 \
-192.168.75.24:7000 \
-192.168.75.25:7000 \
-192.168.75.26:7000 \
---cluster-replicas 1
+redis-cli --cluster create 192.168.75.##:7000 192.168.75.##:7000 192.168.75.##:7000 192.168.75.##:7000 192.168.75.##:7000 192.168.75.##:7000 --cluster-replicas 1
 ```
 
 After runnign this command **three master nodes** as well as **three replica nodes** should be created. Please confirm the proposed configuration with *YES*.
